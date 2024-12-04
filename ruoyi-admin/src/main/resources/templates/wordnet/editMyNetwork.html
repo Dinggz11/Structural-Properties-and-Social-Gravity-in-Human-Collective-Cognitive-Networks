@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('修改词汇网络')"/>
+</head>
+<body>
+<form action="" class="layui-form">
+    <input type="hidden" name="id" th:value="${myWordRelation.id}">
+    <div class="main-container">
+        <table style="margin:auto;border-collapse:separate; border-spacing:0px 20px;">
+            <tr>
+                <td>词汇&nbsp;&nbsp;</td>
+                <td colspan="2">
+                    <div th:switch="${myWordRelation.from.type}">
+                        <div class="layui-input-block">
+                            <div th:case=1>
+                                <input autocomplete="off" readonly class="layui-input" lay-verify="required" name="from"
+                                       placeholder="from"
+                                       type="text" th:value="${myWordRelation.from.word}">
+
+                            <input type="hidden" name="fromId" readonly th:value="${myWordRelation.from.id}">
+                            </div>
+                            <div th:case=2>
+                                <input autocomplete="off"  class="layui-input" lay-verify="required" name="from"
+                                       placeholder="from"
+                                       type="text" th:value="${myWordRelation.from.word}">
+
+                                <input type="hidden" name="fromId"  th:value="${myWordRelation.from.id}">
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>关系</td>
+                <td colspan="2">
+                    <div class="layui-input-block">
+                        <input autocomplete="off" class="layui-input" lay-verify="required" name="relation"
+                               placeholder="关系"
+                               type="text" th:value="${myWordRelation.relation}">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>关联词汇</td>
+                <td colspan="2">
+                    <div th:switch="${myWordRelation.to.type}">
+                        <div class="layui-input-block">
+                            <div th:case=1>
+                                <input autocomplete="off" readonly class="layui-input" lay-verify="required" name="to"
+                                       placeholder="to"
+                                       type="text" th:value="${myWordRelation.to.word}">
+
+                                <input type="hidden" name="toId" readonly th:value="${myWordRelation.to.id}">
+                            </div>
+                            <div th:case=2>
+                                <input autocomplete="off"  class="layui-input" lay-verify="required" name="to"
+                                       placeholder="to"
+                                       type="text" th:value="${myWordRelation.to.word}">
+
+                                <input type="hidden" name="toId"  th:value="${myWordRelation.to.id}">
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="bottom">
+        <div class="button-container">
+            <button class="pear-btn pear-btn-primary pear-btn-sm" lay-filter="power-save" lay-submit="" type="submit">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button class="pear-btn pear-btn-sm" type="reset">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<th:block th:include="include :: footer"/>
+<script>
+    layui.link('/component/pear/css/autocomplete.css');
+    layui.use(['form', 'jquery', 'autocomplete'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let autocomplete = layui.autocomplete;
+        form.on('submit(power-save)', function (data) {
+            $.ajax({
+                url: '/wordnet/updateMyNetwork',
+                data: JSON.stringify(data.field),
+                dataType: 'json',
+                contentType: 'application/json',
+                type: 'post',
+                success: function (result) {
+                    if (result.success) {
+                        layer.msg(result.msg, {icon: 1, time: 1000}, function () {
+                            parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                            parent.location.reload();
+                        });
+                    } else {
+                        layer.msg(result.msg, {icon: 2, time: 1000});
+                    }
+                }
+            })
+            return false;
+        });
+    })
+</script>
+<script>
+</script>
+</body>
+</html>

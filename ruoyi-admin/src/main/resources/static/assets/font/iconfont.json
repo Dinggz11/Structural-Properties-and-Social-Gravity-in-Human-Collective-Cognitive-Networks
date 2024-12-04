@@ -1,0 +1,107 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1447797",
+      "name": "学习分析",
+      "font_class": "xuexifenxi",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "2726789",
+      "name": "国外学习交流课程",
+      "font_class": "guowaixuexijiaoliukecheng",
+      "unicode": "e513",
+      "unicode_decimal": 58643
+    },
+    {
+      "icon_id": "2726804",
+      "name": "专题学习会",
+      "font_class": "zhuantixuexihui",
+      "unicode": "e51b",
+      "unicode_decimal": 58651
+    },
+    {
+      "icon_id": "4294147",
+      "name": "我的学习",
+      "font_class": "wodexuexi",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "7037111",
+      "name": "学习中心",
+      "font_class": "xuexizhongxin",
+      "unicode": "e710",
+      "unicode_decimal": 59152
+    },
+    {
+      "icon_id": "7580584",
+      "name": "廉政学习",
+      "font_class": "ziyuan",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "8452526",
+      "name": "学习轨迹",
+      "font_class": "xuexiguiji",
+      "unicode": "e6c2",
+      "unicode_decimal": 59074
+    },
+    {
+      "icon_id": "11940971",
+      "name": "星途学堂图标-讨论",
+      "font_class": "xingtuxuetangtubiao-taolun",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "11957192",
+      "name": "星途学堂-课程/学习",
+      "font_class": "xingtuxuetang-kecheng-",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "12590350",
+      "name": "数位学习 (2)",
+      "font_class": "shuweixuexi",
+      "unicode": "e6a6",
+      "unicode_decimal": 59046
+    },
+    {
+      "icon_id": "12590354",
+      "name": "数位学习",
+      "font_class": "shuweixuexi1",
+      "unicode": "e6a7",
+      "unicode_decimal": 59047
+    },
+    {
+      "icon_id": "19853768",
+      "name": "学习中心",
+      "font_class": "zuixing-71",
+      "unicode": "e63d",
+      "unicode_decimal": 58941
+    },
+    {
+      "icon_id": "27090705",
+      "name": "幻灯片，教案，教学，学习",
+      "font_class": "a-huandengpianjiaoanjiaoxuexuexi",
+      "unicode": "e86c",
+      "unicode_decimal": 59500
+    },
+    {
+      "icon_id": "29095580",
+      "name": "台灯，学习",
+      "font_class": "a-taidengxuexi",
+      "unicode": "e8dd",
+      "unicode_decimal": 59613
+    }
+  ]
+}

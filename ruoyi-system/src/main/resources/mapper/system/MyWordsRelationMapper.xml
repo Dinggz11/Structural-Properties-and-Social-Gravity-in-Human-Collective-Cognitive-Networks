@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruoyi.system.mapper.MyWordsRelationMapper">
+    <resultMap id="baseResultMap" type="com.ruoyi.system.domain.MyWordsRelation">
+        <id column="id" property="id"/>
+        <result column="from_id" property="fromId"/>
+        <result column="to_id" property="toId"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="exp_id" property="expId"/>
+        <result column="relation" property="relation"/>
+        <result column="deleted" property="deleted"/>
+        <association property="from" column="from_id" select="findMyWordsById"/>
+        <association property="to" column="to_id" select="findMyWordsById"/>
+        <association property="createUser" column="create_user_id" select="findUserById"/>
+    </resultMap>
+    <select id="findMyWordsById" resultType="com.ruoyi.system.domain.MyWords">
+        select p.id,p.word,p.create_user_id,p.type,p.exp_id,p.create_time from exp_my_words p where p.id = #{id} and p.deleted = 0
+    </select>
+    <select id="findUserById" resultType="com.ruoyi.common.core.domain.entity.SysUser">
+        select u.user_id,u.username,u.real_name from sys_user u where u.user_id = #{id}
+    </select>
+    <select id="getCountByWordId" resultType="java.lang.Integer" >
+        select count(*)
+        from exp_my_word_relation
+        where (from_id = #{wordId} or to_id = #{wordId}) and deleted=0 and exp_id=#{expId}
+    </select>
+    <delete id="deleteRelationByExpIdAndUserId">
+        delete from exp_my_word_relation where  exp_id=#{expId} and create_user_id=#{userId}
+    </delete>
+
+</mapper>

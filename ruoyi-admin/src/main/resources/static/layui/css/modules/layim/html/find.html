@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>发现&查找</title>
+
+  <link rel="stylesheet" href="../../../layui.css">
+  <style>
+    .margin-bottom{
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div style="margin: 15px;">
+  <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+    <ul class="layui-tab-title">
+      <li class="layui-this">找人</li>
+      <li>找群</li>
+    </ul>
+    <div id="LAY_MODEL" class="layui-tab-content" style="height: 100px;">
+      <div class="layui-tab-item layui-show">
+        <form class="layui-form" action="">
+          <div class="layui-form-item">
+            <div class="layui-input-inline">
+              <input type="text" name="name" maxlength="27" placeholder="请输入昵称" autocomplete="off" class="layui-input">
+            </div>
+            <button class="layui-btn" lay-submit="" lay-filter="search1">搜索</button>
+          </div>
+        </form>
+        <hr>
+        <div class="layui-container">
+          <div class="layui-row layui-col-space1">
+            <!-- 单个记录 -->
+            <div id="LAY_view_user"></div>
+            <!-- 单个记录 -->
+          </div>
+        </div>
+
+      </div>
+      <div class="layui-tab-item">
+        <form class="layui-form" action="">
+          <div class="layui-form-item">
+            <div class="layui-input-inline">
+              <input type="text" name="name" maxlength="27" placeholder="请输入群名" autocomplete="off" class="layui-input">
+            </div>
+            <button class="layui-btn" lay-submit="" lay-filter="search2">搜索</button>
+            <button type="button" class="layui-btn layui-btn-normal" id="btn-create-group">创建群</button>
+          </div>
+        </form>
+        <hr>
+        <div class="layui-container">
+          <div class="layui-row layui-col-space1">
+            <!-- 单个记录 -->
+            <div id="LAY_view_group"></div>
+            <!-- 单个记录 -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<textarea title="好友模版" id="LAY_tpl_user" style="display:none;">
+{{# layui.each(d.data, function(index, item){ }}
+<div class="layui-col-md3 margin-bottom">
+  <div class="layui-row">
+    <div class="layui-col-md3 layui-col-lg-offset3">
+      <img class="layui-circle" width="50" height="50" src="{{item.avatar}}" alt=""/>
+    </div>
+    <div class="layui-col-md6">
+      <div class="layui-row">
+        <div class="layui-col-md12">
+          <div>{{item.username}}</div>
+        </div>
+        <div class="layui-col-md12">
+          <button q-id="{{item.id}}" type="button" class="layui-btn layui-btn-primary layui-btn-sm addUser">+好友</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{# }); }}
+</textarea>
+
+
+<textarea title="群模版" id="LAY_tpl_group" style="display:none;">
+{{# layui.each(d.data, function(index, item){  }}
+<div class="layui-col-md3 margin-bottom">
+  <div class="layui-row">
+      <div class="layui-col-md3 layui-col-lg-offset3">
+          <img class="layui-circle" width="50" height="50" src="{{item.avatar}}" alt=""/>
+      </div>
+      <div class="layui-col-md6">
+          <div class="layui-row">
+              <div class="layui-col-md12">
+                  <div>{{item.groupname}}</div>
+              </div>
+              <div class="layui-col-md12">
+                  <button q-id="{{item.id}}" type="button" class="layui-btn layui-btn-primary layui-btn-sm addGroup">+群</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+{{# }); }}
+</textarea>
+
+
+<div id="add-main" style="display: none;margin-top: 40px;">
+  <form class="layui-form" id="add-form"  action="">
+    <div class="layui-form-item center" >
+      <label class="layui-form-label" style="width: 100px" >群名称</label>
+      <div class="layui-input-block">
+        <input type="text" name="groupname" required value="" style="width: 240px"  lay-verify="required" placeholder="请输入群名称" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="createGroup" >立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary" id="closeBtn" >重置</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+<script src="../../../../layui.js"></script>
+<script src="../../../../../js/axios.js"></script>
+<script src="../../../../../js/axios_instance.js"></script>
+<script>
+  layui.use(['layim', 'laypage','element','form'], function(){
+    var layim = layui.layim
+            ,layer = layui.layer
+            ,form = layui.form
+            ,laytpl = layui.laytpl
+            ,$ = layui.jquery
+            ,element = layui.element //Tab的切换功能，切换事件监听等，需要依赖element模块
+            ,laypage = layui.laypage;
+
+    //一些添加好友请求之类的交互参见文档
+
+
+    //监听选项卡切换
+    element.on('tab(docDemoTabBrief)', function(data){
+      console.log(data.index);
+    });
+
+    var userData; // 缓存用户列表
+    var groupData; // 缓存群列表
+
+    // 搜索人
+    form.on('submit(search1)', function (data) {
+      //JSON.stringify(data.field)   这是表单中所有的数据
+      var keyword = data.field.name;
+      //loading层
+      var loadIndex = layer.load(1, {
+        shade: [0.1,'#fff'] //0.1透明度的白色背景
+      });
+      request({
+        method: 'get',
+        url: '/layim/search/user?keyword=' + keyword
+      }).then(res => {
+        userData = res.data;
+        console.log(userData);
+        var html_user = laytpl(LAY_tpl_user.value).render({
+          data: userData
+        });
+        $('#LAY_view_user').html(html_user);
+      }).catch(e => {
+        layer.msg("请求失败")
+      }).finally(() => {
+        layer.close(loadIndex);
+      });
+      return false;
+    })
+
+    // 搜索群
+    form.on('submit(search2)', function (data) {
+      //JSON.stringify(data.field)   这是表单中所有的数据
+      var keyword = data.field.name;
+      //loading层
+      var loadIndex = layer.load(1, {
+        shade: [0.1,'#fff'] //0.1透明度的白色背景
+      });
+      request({
+        method: 'get',
+        url: '/layim/search/group?keyword=' + keyword
+      }).then(res => {
+        groupData = res.data;
+        var html_group = laytpl(LAY_tpl_group.value).render({
+          data: groupData
+        });
+        $('#LAY_view_group').html(html_group);
+      }).catch(e => {
+        layer.msg("请求失败")
+      }).finally(() => {
+        layer.close(loadIndex);
+      });
+      return false;
+    })
+
+    $("#LAY_MODEL").on('click', ".addUser", function () {
+      var qid = $(this).attr("q-id")
+      // 找出选择的数据
+      let checkItem;
+      for (let item of userData){
+        if (item.id == qid){
+          checkItem = item;
+          console.log(checkItem);
+          break;
+        }
+      }
+      // 申请添加好友
+      layim.add({
+        type: 'friend' //friend：申请加好友、group：申请加群
+        ,username: checkItem.username //好友昵称，若申请加群，参数为：groupname
+        ,avatar: checkItem.avatar //头像
+        ,submit: function(group, remark, index){ //一般在此执行Ajax和WS，以通知对方
+          //loading层
+          var loadIndex = layer.load(1, {
+            shade: [0.1,'#fff'] //0.1透明度的白色背景
+          });
+          request({
+            method: 'post',
+            url: '/layim/apply/user',
+            data: {
+              mineId: parent.layui.layim.cache().mine.id,
+              toId: checkItem.id,
+              groupId: group,
+              remark: remark
+            }
+          }).then(res => {
+            if(res.code == 0){
+              layer.msg("申请已发出")
+            }else{
+              layer.msg(res.msg)
+            }
+          }).catch(e => {
+            layer.msg("请求失败")
+          }).finally(() => {
+            layer.close(loadIndex);
+            layer.close(index); //关闭改面板
+          });
+        }
+      });
+    }).on('click', '.addGroup', function () {
+      // 找出选择的数据
+      var qid = $(this).attr("q-id")
+      let checkItem;
+      for (let item of groupData){
+        if (item.id == qid){
+          checkItem = item;
+          break;
+        }
+      }
+      // 申请加群
+      layim.add({
+        type: 'group' //friend：申请加好友、group：申请加群
+        ,groupname: checkItem.groupname //好友昵称，若申请加群，参数为：groupname
+        ,avatar: checkItem.avatar //头像
+        ,submit: function(group, remark, index){ //一般在此执行Ajax和WS，以通知对方
+          //loading层
+          var loadIndex = layer.load(1, {
+            shade: [0.1,'#fff'] //0.1透明度的白色背景
+          });
+          request({
+            method: 'post',
+            url: '/layim/apply/group',
+            data: {
+              mineId: parent.layui.layim.cache().mine.id,
+              groupId: checkItem.id,
+              remark: remark
+            }
+          }).then(res => {
+            if(res.code == 0){
+              layer.msg("申请已发出")
+            }else{
+              layer.msg(res.msg)
+            }
+          }).catch(e => {
+            layer.msg("请求失败")
+          }).finally(() => {
+            layer.close(loadIndex);
+            layer.close(index); //关闭改面板
+          });
+        }
+      });
+    });
+
+    // 创建群
+    var createGroupIndex;
+    $("#btn-create-group").click(function (e) {
+      //页面层-自定义
+      createGroupIndex = layer.open({
+        type: 1,
+        title:"创建群",
+        area: ['400px', '300px'],
+        content: $("#add-main")
+      });
+    })
+
+    // 创建群
+    form.on('submit(createGroup)', function (data) {
+      var params = data.field;
+      //loading层
+      var loadIndex = layer.load(1, {
+        shade: [0.1,'#fff'] //0.1透明度的白色背景
+      });
+      request({
+        method: 'post',
+        url: '/layim/group/add',
+        data: params
+      }).then(res => {
+        if (res.code == 0) {
+          layer.close(createGroupIndex)
+          layer.msg("创建成功")
+          window.parent.location.reload()//刷新父页面
+        }else {
+          layer.msg(res.msg)
+        }
+      }).catch(e => {
+        layer.msg("请求失败")
+      }).finally(() => {
+        layer.close(loadIndex);
+      })
+      return false;
+    })
+
+  });
+</script>
+</body>
+</html>

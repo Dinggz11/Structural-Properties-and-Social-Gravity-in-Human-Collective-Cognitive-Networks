@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('词汇网络实验')"/>
+    <script th:src="@{/assets/vis/vis-network.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery/jquery-3.2.1.min.js}"></script>
+</head>
+
+<body class="pear-container">
+<h1 style="margin: 0 auto;text-align: center">词汇网络实验</h1><br/>
+<h3 style="margin: 0 auto;text-align: center;color: #000000">单击词汇节点即可进行词汇关系维护</h3>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <button id="myNetworkList" class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i
+                class="layui-icon layui-icon-edit"></i>维护我的词汇网络</button>
+
+        <button id="deleteMyNetWork" class="pear-btn pear-btn-danger pear-btn-sm" lay-event="edit"><i
+                class="layui-icon layui-icon-edit"></i>删除实验数据，重新实验</button>
+    </div>
+    <div class="layui-row layui-col-md12">
+        <div id="mynetwork" style="width: 100%;height: 1000px;"></div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+</body>
+
+<script th:inline="javascript">
+    let expId = [[${expId}]];
+    const MODULE_PATH = "/wordnet/";
+
+    $(document).ready(
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url:"/wordnet/getNetWork/"+expId,
+            success: function (data) {
+                var nodes = new vis.DataSet(data.nodes);
+                var edges = new vis.DataSet(data.edges);
+                var container = document.getElementById('mynetwork');
+                var data = {
+                    nodes: nodes,
+                    edges: edges
+                };
+                var options = {};
+                var network = new vis.Network(container, data, options);
+                //单击节点事件
+                network.on("click", function (params) {
+                    params.event = "[original event]";
+                    var id =params.nodes;
+                    if(id!=null&&id>0){
+                        layer.open({
+                            type: 2,
+                            title: '新增',
+                            shade: 0.1,
+                            area: ['800px', '400px'],
+                            content: MODULE_PATH + 'add?expId='+expId + '&id='+id
+                    });
+                    }
+                });
+            }
+        })
+    );
+    layui.use(['layer', 'form', 'util'], function () {
+        let $ = layui.jquery;
+        let layer = layui.layer;
+
+        // 添加问题解决网络
+        $('#btnAddNetwork').click(function () {
+            layer.open({
+                type: 2,
+                title: '新增',
+                shade: 0.1,
+                area: ['800px', '400px'],
+                content: MODULE_PATH + 'add?expId='+expId
+            });
+        });
+
+        $('#myNetworkList').click(function () {
+            window.open('/wordnet/maintainMyNetwork?expId='+expId)
+        });
+
+        //重新开始实验
+        $('#deleteMyNetWork').click(function () {
+            layer.confirm('确定要删除数据，重新开始实验？', {icon: 3, title: '提示'}, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                window.location.href = '/wordnet/deleteMyNetWork/' + expId;
+
+            });
+        });
+
+    });
+</script>
+</html>
